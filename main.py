@@ -3,6 +3,7 @@ import time
 from arm import pick_box_from_conveyor, move_box_in_front_of_camera, place_box_in_color_bin, return_to_default
 from arm import move_arm_to_position, ARM_DEFAULT_POSITION
 from camera import detect_color_once
+from web_interface import update_system_state
 
 arduino_port = "COM3"
 baud_rate = 9600
@@ -27,15 +28,17 @@ while True:
             print("From Arduino:", message)
 
             if message == "box_detected":
-                # Box reached the end of the conveyor.
+                update_system_state(status="Processing new box")
                 print("Box detected by Arduino. Handling with arm...")
                 time.sleep(1)
 
                 # Step 1: Arm picks the box from conveyor
+                update_system_state(position="picking")
                 pick_box_from_conveyor()
                 time.sleep(1)
 
                 # Step 2: Arm moves box in front of camera for color detection
+                update_system_state(position="camera")
                 move_box_in_front_of_camera()
                 time.sleep(1)
 
@@ -43,14 +46,17 @@ while True:
                 color = detect_color_once()
                 if color:
                     print(f"Detected color: {color}")
+                    update_system_state(color=color)
                 else:
                     print("No recognizable color detected. Defaulting to leaving it as is.")
                     color = None
 
                 # Step 4: Place box in corresponding bin
+                update_system_state(position=f"placing_{color.lower() if color else 'unknown'}")
                 place_box_in_color_bin(color)
 
                 # Step 5: Arm returns to default position
+                update_system_state(position="default", status="idle")
                 return_to_default()
 
                 # Step 6: Notify Arduino that arm is done

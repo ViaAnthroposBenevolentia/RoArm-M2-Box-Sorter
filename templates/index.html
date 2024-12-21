@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robotic Arm Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function updateState() {
+            fetch('/api/state')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status').textContent = data.system_status;
+                    document.getElementById('position').textContent = data.arm_position;
+                    document.getElementById('last-color').textContent = data.last_detected_color || 'None';
+                    document.getElementById('total-boxes').textContent = data.total_boxes_processed;
+                    document.getElementById('red-count').textContent = data.color_counts.Red;
+                    document.getElementById('green-count').textContent = data.color_counts.Green;
+                    document.getElementById('yellow-count').textContent = data.color_counts.Yellow;
+                    document.getElementById('last-action').textContent = data.last_action_time || 'Never';
+                });
+        }
+
+        // Update every 1 second
+        setInterval(updateState, 1000);
+    </script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8 text-center">Robotic Arm Control Panel</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- System Status -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">System Status</h2>
+                <div class="space-y-2">
+                    <p>Status: <span id="status" class="font-medium">{{ state.system_status }}</span></p>
+                    <p>Arm Position: <span id="position" class="font-medium">{{ state.arm_position }}</span></p>
+                    <p>Last Action: <span id="last-action" class="font-medium">{{ state.last_action_time or 'Never' }}</span></p>
+                </div>
+            </div>
+
+            <!-- Color Detection -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Color Detection</h2>
+                <div class="space-y-2">
+                    <p>Last Detected Color: <span id="last-color" class="font-medium">{{ state.last_detected_color or 'None' }}</span></p>
+                    <p>Total Boxes Processed: <span id="total-boxes" class="font-medium">{{ state.total_boxes_processed }}</span></p>
+                </div>
+            </div>
+
+            <!-- Color Statistics -->
+            <div class="bg-white rounded-lg shadow p-6 md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4">Color Statistics</h2>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center p-4 bg-red-100 rounded">
+                        <p class="text-red-600 font-bold text-2xl" id="red-count">{{ state.color_counts.Red }}</p>
+                        <p class="text-red-600">Red Boxes</p>
+                    </div>
+                    <div class="text-center p-4 bg-green-100 rounded">
+                        <p class="text-green-600 font-bold text-2xl" id="green-count">{{ state.color_counts.Green }}</p>
+                        <p class="text-green-600">Green Boxes</p>
+                    </div>
+                    <div class="text-center p-4 bg-yellow-100 rounded">
+                        <p class="text-yellow-600 font-bold text-2xl" id="yellow-count">{{ state.color_counts.Yellow }}</p>
+                        <p class="text-yellow-600">Yellow Boxes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
