@@ -23,11 +23,6 @@
 
         // Update every 1 second
         setInterval(updateState, 1000);
-
-        // Add error handling for the camera feed
-        document.querySelector('img[alt="Camera Feed"]').onerror = function() {
-            this.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="14">Camera Offline</text></svg>';
-        };
     </script>
 </head>
 <body class="bg-gray-100">
@@ -70,14 +65,6 @@
                         <p class="text-yellow-600 font-bold text-2xl" id="yellow-count">{{ state.color_counts.Yellow }}</p>
                         <p class="text-yellow-600">Yellow Boxes</p>
                     </div>
-                </div>
-            </div>
-
-            <!-- Camera Feed -->
-            <div class="bg-white rounded-lg shadow p-6 md:col-span-2">
-                <h2 class="text-xl font-semibold mb-4">Camera Feed</h2>
-                <div class="aspect-w-16 aspect-h-9">
-                    <img src="{{ url_for('video_feed') }}" class="rounded-lg w-full" alt="Camera Feed">
                 </div>
             </div>
         </div>
