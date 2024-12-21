@@ -12,7 +12,7 @@ baud_rate = 9600
 
 # Set up logging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler('robot_arm.log'),
@@ -49,6 +49,7 @@ while True:
                     print("From Arduino:", message)
 
                     if message == "box_detected":
+                        logging.debug("Box detected, starting process...")
                         update_system_state(status="Processing new box")
                         print("Box detected by Arduino. Handling with arm...")
                         time.sleep(1)
@@ -66,11 +67,18 @@ while True:
                         # Step 3: Detect color using laptop camera
                         color = detect_color_once()
                         if color:
-                            print(f"Detected color: {color}")
+                            logging.debug(f"Color detected: {color}")
                             update_system_state(color=color)
+                            logging.debug("State updated")
+                            print(f"Detected color: {color}")
+                            try:
+                                update_system_state(color=color, status=f"Processing {color} box")
+                                print(f"Updated state for color: {color}")  # Debug print
+                            except Exception as e:
+                                print(f"Error updating state: {e}")
                         else:
                             print("No recognizable color detected. Defaulting to leaving it as is.")
-                            color = None
+                            update_system_state(status="No color detected")
 
                         # Step 4: Place box in corresponding bin
                         update_system_state(position=f"placing_{color.lower() if color else 'unknown'}")

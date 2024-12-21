@@ -10,6 +10,7 @@
             fetch('/api/state')
                 .then(response => response.json())
                 .then(data => {
+                    console.log("Received state update:", data);  // Debug log
                     document.getElementById('status').textContent = data.system_status;
                     document.getElementById('position').textContent = data.arm_position;
                     document.getElementById('last-color').textContent = data.last_detected_color || 'None';
@@ -18,6 +19,9 @@
                     document.getElementById('green-count').textContent = data.color_counts.Green;
                     document.getElementById('yellow-count').textContent = data.color_counts.Yellow;
                     document.getElementById('last-action').textContent = data.last_action_time || 'Never';
+                })
+                .catch(error => {
+                    console.error("Error updating state:", error);
                 });
         }
 
